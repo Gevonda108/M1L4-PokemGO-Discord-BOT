@@ -2,6 +2,11 @@ import discord
 from discord.ext import commands
 from config import token
 from logic import Pokemon
+from logic import Pokemon, Wizard, Fighter
+
+import random
+
+
 
 # Setting up intents for the bot
 intents = discord.Intents.default()  # Getting the default settings
@@ -15,7 +20,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 # An event that is triggered when the bot is ready to run
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user.name}')  # Outputs the bot's name to the console
+    print(f'Gooning to {bot.user}')  # Outputs the bot's name to the console
 
 # The '!go' command
 @bot.command()
@@ -24,6 +29,14 @@ async def go(ctx):
     # Check whether the user already has a Pokémon. If not, then...
     if author not in Pokemon.pokemons.keys():
         pokemon = Pokemon(author)  # Creating a new Pokémon
+        chance = random.randint(1, 3)  # Menghasilkan angka acak dari 1 hingga 3
+        # Buat objek Pokémon tergantung pada nomor acak
+        if chance == 1:
+            pokemon = Pokemon(author)  # Membuat Pokémon standar
+        elif chance == 2:
+            pokemon = Wizard(author)  # Membuat Pokémon Wizard 
+        elif chance == 3:
+            pokemon = Fighter(author)
         await ctx.send(await pokemon.info())  # Sending information about the Pokémon
         image_url = await pokemon.show_img()  # Getting the URL of the Pokémon image
         if image_url:
@@ -39,5 +52,18 @@ async def go(ctx):
 async def start(ctx):
     await ctx.send("Hi, I am a Pokémon game bot! To create your own pokemon, enter !go")
 
+@bot.command()
+async def attack(ctx):
+    target = ctx.message.mentions[0] if ctx.message.mentions else None
+    if target:
+        if target.name in Pokemon.pokemons and ctx.author.name in Pokemon.pokemons:
+            enemy = Pokemon.pokemons[target.name]
+            attacker = Pokemon.pokemons[ctx.author.name]
+            result = await attacker.attack(enemy)
+            await ctx.send(result)
+        else:
+            await ctx.send("Kedua peserta harus memiliki Pokemon untuk bertarung!")
+    else:
+        await ctx.send("Tetapkan pengguna yang ingin Anda serang dengan menyebut mereka.")
 # Running the bot
 bot.run(token)
