@@ -115,12 +115,6 @@ M1L4/
 4. Push to branch: `git push origin feature-name`.
 5. Submit a pull request.
 
-### Running Tests
-
-```bash
-# No tests implemented yet, but you can add unit tests for logic.py
-pytest
-```
 
 ## 📄 License
 
