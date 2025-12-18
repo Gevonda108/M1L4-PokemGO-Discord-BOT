@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from config import token
 from logic import Pokemon, Wizard, Fighter
-
+import datetime
 import random
 import os
 import sys
@@ -154,6 +154,15 @@ async def feed(ctx, food_type=None):
         embed = discord.Embed(title="Feeding Pokémon", description=result, color=0x00ff00 if "Fed" in result else 0xff0000)
         await ctx.send(embed=embed)
 
+@bot.command()
+async def mealtime(ctx):
+    author = ctx.author.name
+    if author in Pokemon.pokemons:
+        pokemon = Pokemon.pokemons[author]
+        response = await pokemon.mealtime()
+        await ctx.send(response)
+    else:
+        await ctx.send("Anda tidak memiliki Pokémon!")
 @bot.command()
 async def reroll(ctx):
     author = ctx.author.name

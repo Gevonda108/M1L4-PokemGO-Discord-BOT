@@ -1,6 +1,6 @@
 import aiohttp
 import random
-
+import datetime
 class Pokemon:
     pokemons = {}
 
@@ -18,6 +18,8 @@ class Pokemon:
         self.food_inventory = {"basic": 0, "rare": 0, "epic": 0}
         self.types = []
         self.abilities = []
+        self.last_feed_time = datetime.datetime.now()
+  
 
         if pokemon_trainer not in Pokemon.pokemons:
             Pokemon.pokemons[pokemon_trainer] = self
@@ -85,7 +87,16 @@ class Pokemon:
         healed = self.hp - old_hp
         level_msg = await self.gain_exp(exp_gained)
         return f"Fed your Pokémon {food_type} food! Gained {exp_gained} EXP and healed {healed} HP. {level_msg}"
-
+    async def mealtime(self, feed_interval = 20, hp_increase = 10 ):
+        current_time = datetime.datetime.now()  
+        delta_time = datetime.timedelta(seconds=feed_interval)  
+        if (current_time - self.last_feed_time) > delta_time:
+            self.hp += hp_increase
+            self.last_feed_time = current_time
+            return f"Kesehatan Pokemon dipulihkan. HP saat ini: {self.hp}"
+        else:
+            return f"Kalian dapat memberi makan Pokémon kalian di: {current_time+delta_time}"
+   
     def buy_food(self, food_type, quantity=1):
         prices = {"basic": 20, "rare": 50, "epic": 100}
         if food_type not in prices:
@@ -137,7 +148,8 @@ class Pokemon:
 
 
 class Wizard(Pokemon):
-    pass
+    async def mealtime(self):
+        return  super().mealtime(feed_interval=5, hp_increase=20)
 
 
 class Fighter(Pokemon):
@@ -147,3 +159,6 @@ class Fighter(Pokemon):
         result = await super().attack(enemy)
         self.power -= super_power
         return result + f"\nPetarung menggunakan serangan super dengan kekuatan:{super_power} "
+
+    async def mealtime(self):
+        return  super().mealtime(feed_interval=5, hp_increase=20)
